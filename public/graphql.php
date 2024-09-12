@@ -1,5 +1,4 @@
 <?php
-
 require_once '../vendor/autoload.php';
 
 use GraphQL\GraphQL;
@@ -15,27 +14,31 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
     exit;
 }
 
 try {
     $controller = new GraphQLController();
-
     $schema = new Schema([
         'query' => $controller->getQueryType(),
         'mutation' => $controller->getMutationType(),
     ]);
 
-    // Handle GET or POST request
+    // For testing purposes, hard-code a sample query if none is provided
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
         $query = $_GET['query'];
         $variableValues = isset($_GET['variables']) ? json_decode($_GET['variables'], true) : null;
     } else {
         $rawInput = file_get_contents('php://input');
         $input = json_decode($rawInput, true);
-        $query = $input['query'] ?? null;
+        $query = $input['query'] ?? '{ __schema { queryType { name } } }'; // Sample query here
         $variableValues = $input['variables'] ?? null;
     }
+
+    // Log the query and variables for debugging
+    error_log('GraphQL Query: ' . $query);
+    error_log('GraphQL Variables: ' . json_encode($variableValues));
 
     // Handle introspection query
     if ($query === Introspection::getIntrospectionQuery()) {
@@ -51,7 +54,6 @@ try {
 
     // Include debug information in the output
     $output = $result->toArray(DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE);
-
 } catch (Throwable $e) {
     error_log('GraphQL Error: ' . $e->getMessage());
     error_log('Stack Trace: ' . $e->getTraceAsString());

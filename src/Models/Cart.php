@@ -91,7 +91,7 @@ class Cart
             INSERT INTO cart (productID, priceID, quantity, size, capacity, color, touch_id, usb_port)
             VALUES (
                 ?,
-                (SELECT id FROM product_prices WHERE product_id = ?),
+                (SELECT id FROM product_prices WHERE product_id = ? limit 1),
                 1,
                 (SELECT attribute_value FROM product_attributes WHERE product_id = ? AND attribute_name = 'Size'  LIMIT 1),
                 (SELECT attribute_value FROM product_attributes WHERE product_id = ? AND attribute_name = 'Capacity'  LIMIT 1),  

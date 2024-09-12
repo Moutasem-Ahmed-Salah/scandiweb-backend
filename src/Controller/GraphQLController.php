@@ -23,17 +23,35 @@ class GraphQLController
 
     public function __construct()
     {
+        // Load environment variables from .env file
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
 
-        $this->db = new mysqli($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+        // Get database connection details from environment variables
+        $dbHost = $_ENV['DB_HOST'] ;
+        $dbUser = $_ENV['DB_USER'] ;
+        $dbPass = $_ENV['DB_PASS'] ;
+        $dbName = $_ENV['DB_NAME'] ;
+        $dbPort = $_ENV['DB_PORT'];
 
+        // Debug output to verify environment variables
+        error_log("DB Host: $dbHost");
+        error_log("DB User: $dbUser");
+        error_log("DB Name: $dbName");
+        error_log("DB Port: $dbPort");
+
+        // Create a new MySQLi connection
+        $this->db = new mysqli($dbHost, $dbUser, $dbPass, $dbName, $dbPort);
+
+        // Check connection
         if ($this->db->connect_error) {
+            error_log('Database connection failed: ' . $this->db->connect_error);
             die('Database connection failed: ' . $this->db->connect_error);
         }
 
         $this->initTypes();
     }
+
 
     private function initTypes()
     {
