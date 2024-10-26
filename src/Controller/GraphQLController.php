@@ -28,10 +28,10 @@ class GraphQLController
         $dotenv->load();
 
         // Get database connection details from environment variables
-        $dbHost = $_ENV['DB_HOST'] ;
-        $dbUser = $_ENV['DB_USER'] ;
-        $dbPass = $_ENV['DB_PASS'] ;
-        $dbName = $_ENV['DB_NAME'] ;
+        $dbHost = $_ENV['DB_HOST'];
+        $dbUser = $_ENV['DB_USER'];
+        $dbPass = $_ENV['DB_PASS'];
+        $dbName = $_ENV['DB_NAME'];
         $dbPort = $_ENV['DB_PORT'];
 
         // Debug output to verify environment variables
@@ -118,23 +118,23 @@ class GraphQLController
             ],
         ]);
 
-        $this->cartItemType = new ObjectType([
-            'name' => 'CartItem',
-            'fields' => [
-                'cartitemID' => Type::nonNull(Type::int()),
-                'productID' => Type::string(),
-                'name' => Type::string(),
-                'price_per_unit' => Type::float(),
-                'quantity' => Type::int(),
-                'currency_symbol' => Type::string(),
-                'color' => Type::string(),
-                'size' => Type::string(),
-                'capacity' => Type::string(),
-                'first_image' => Type::string(),
-                'usb_port' => Type::string(),
-                'touch_id' => Type::string(),
-            ],
-        ]);
+        // $this->cartItemType = new ObjectType([
+        //     'name' => 'CartItem',
+        //     'fields' => [
+        //         'cartitemID' => Type::nonNull(Type::int()),
+        //         'productID' => Type::string(),
+        //         'name' => Type::string(),
+        //         'price_per_unit' => Type::float(),
+        //         'quantity' => Type::int(),
+        //         'currency_symbol' => Type::string(),
+        //         'color' => Type::string(),
+        //         'size' => Type::string(),
+        //         'capacity' => Type::string(),
+        //         'first_image' => Type::string(),
+        //         'usb_port' => Type::string(),
+        //         'touch_id' => Type::string(),
+        //     ],
+        // ]);
     }
 
     public function getQueryType()
@@ -167,12 +167,12 @@ class GraphQLController
                         return Product::getProductDetails($this->db, $args['id']);
                     }
                 ],
-                'cart' => [
-                    'type' => Type::listOf($this->cartItemType),
-                    'resolve' => function () {
-                        return Cart::viewCart($this->db);
-                    }
-                ],
+                // 'cart' => [
+                //     'type' => Type::listOf($this->cartItemType),
+                //     'resolve' => function () {
+                //         return Cart::viewCart($this->db);
+                //     }
+                // ],
                 'getAllAttributes' => [
                     'type' => Type::listOf($this->productAttributesType),
                     'resolve' => function () {
@@ -188,138 +188,139 @@ class GraphQLController
         return new ObjectType([
             'name' => 'Mutation',
             'fields' => [
-                'addToCart' => [
-                    'type' => $this->cartItemType,
-                    'args' => [
-                        'productID' => Type::nonNull(Type::string()),
-                        'quantity' => Type::nonNull(Type::int()),
-                        'color' => Type::string(),
-                        'size' => Type::string(),
-                        'capacity' => Type::string(),
-                        'usb_port' => Type::string(),
-                        'touch_id' => Type::string(),
-                    ],
-                    'resolve' => function ($root, $args) {
-                        try {
-                            $productID = $args['productID'];
-                            $quantity = $args['quantity'];
-                            $color = $args['color'] ?? null;
-                            $size = $args['size'] ?? null;
-                            $capacity = $args['capacity'] ?? null;
-                            $usb_port = $args['usb_port'] ?? null;
-                            $touch_id = $args['touch_id'] ?? null;
+                // 'addToCart' => [
+                //     'type' => $this->cartItemType,
+                //     'args' => [
+                //         'productID' => Type::nonNull(Type::string()),
+                //         'quantity' => Type::nonNull(Type::int()),
+                //         'color' => Type::string(),
+                //         'size' => Type::string(),
+                //         'capacity' => Type::string(),
+                //         'usb_port' => Type::string(),
+                //         'touch_id' => Type::string(),
+                //     ],
+                //     'resolve' => function ($root, $args) {
+                //         try {
+                //             $productID = $args['productID'];
+                //             $quantity = $args['quantity'];
+                //             $color = $args['color'] ?? null;
+                //             $size = $args['size'] ?? null;
+                //             $capacity = $args['capacity'] ?? null;
+                //             $usb_port = $args['usb_port'] ?? null;
+                //             $touch_id = $args['touch_id'] ?? null;
 
-                            $cartitemID = Cart::addToCart(
-                                $this->db,
-                                $productID,
-                                $quantity,
-                                $color,
-                                $size,
-                                $capacity,
-                                $usb_port,
-                                $touch_id
-                            );
+                //             $cartitemID = Cart::addToCart(
+                //                 $this->db,
+                //                 $productID,
+                //                 $quantity,
+                //                 $color,
+                //                 $size,
+                //                 $capacity,
+                //                 $usb_port,
+                //                 $touch_id
+                //             );
 
-                            if ($cartitemID === null) {
-                                throw new \GraphQL\Error\Error('Failed to add to cart.');
-                            }
+                //             if ($cartitemID === null) {
+                //                 throw new \GraphQL\Error\Error('Failed to add to cart.');
+                //             }
 
-                            return [
-                                'cartitemID' => $cartitemID,
-                                'productID' => $productID,
-                                'quantity' => $quantity,
-                                'color' => $color,
-                                'size' => $size,
-                                'capacity' => $capacity,
-                                'usb_port' => $usb_port,
-                                'touch_id' => $touch_id,
-                            ];
-                        } catch (\GraphQL\Error\Error $e) {
-                            throw new \GraphQL\Error\Error($e->getMessage());
-                        }
-                    },
-                ],
-                'quickAddToCart' => [
-                    'type' => Type::nonNull(Type::int()),
-                    'args' => [
-                        'productID' => Type::nonNull(Type::string()),
-                    ],
-                    'resolve' => function ($root, $args) {
-                        try {
-                            $productID = $args['productID'];
+                //             return [
+                //                 'cartitemID' => $cartitemID,
+                //                 'productID' => $productID,
+                //                 'quantity' => $quantity,
+                //                 'color' => $color,
+                //                 'size' => $size,
+                //                 'capacity' => $capacity,
+                //                 'usb_port' => $usb_port,
+                //                 'touch_id' => $touch_id,
+                //             ];
+                //         } catch (\GraphQL\Error\Error $e) {
+                //             throw new \GraphQL\Error\Error($e->getMessage());
+                //         }
+                //     },
+                // ],
+                // 'quickAddToCart' => [
+                //     'type' => Type::nonNull(Type::int()),
+                //     'args' => [
+                //         'productID' => Type::nonNull(Type::string()),
+                //     ],
+                //     'resolve' => function ($root, $args) {
+                //         try {
+                //             $productID = $args['productID'];
 
-                            $cartitemID = Cart::QuickAddToCart($this->db, $productID);
+                //             $cartitemID = Cart::QuickAddToCart($this->db, $productID);
 
-                            if ($cartitemID === null) {
-                                throw new \GraphQL\Error\Error('Failed to add to cart quickly.');
-                            }
+                //             if ($cartitemID === null) {
+                //                 throw new \GraphQL\Error\Error('Failed to add to cart quickly.');
+                //             }
 
-                            return $cartitemID;
-                        } catch (\GraphQL\Error\Error $e) {
-                            throw new \GraphQL\Error\Error($e->getMessage());
-                        }
-                    },
-                ],
-                'DeleteCartItem' => [
-                    'type' => Type::nonNull(Type::int()),
-                    'args' => [
-                        'cartitemID' => Type::nonNull(Type::int()),
-                    ],
-                    'resolve' => function ($root, $args) {
-                        try {
-                            $cartitemID = $args['cartitemID'];
+                //             return $cartitemID;
+                //         } catch (\GraphQL\Error\Error $e) {
+                //             throw new \GraphQL\Error\Error($e->getMessage());
+                //         }
+                //     },
+                // ],
+                // 'DeleteCartItem' => [
+                //     'type' => Type::nonNull(Type::int()),
+                //     'args' => [
+                //         'cartitemID' => Type::nonNull(Type::int()),
+                //     ],
+                //     'resolve' => function ($root, $args) {
+                //         try {
+                //             $cartitemID = $args['cartitemID'];
 
-                            $result = Cart::DeleteCartItem($this->db, $cartitemID);
+                //             $result = Cart::DeleteCartItem($this->db, $cartitemID);
 
-                            if ($result === null) {
-                                throw new \GraphQL\Error\Error('Failed to delete cart item.');
-                            }
+                //             if ($result === null) {
+                //                 throw new \GraphQL\Error\Error('Failed to delete cart item.');
+                //             }
 
-                            return $result;
-                        } catch (\GraphQL\Error\Error $e) {
-                            throw new \GraphQL\Error\Error($e->getMessage());
-                        }
-                    },
-                ],
-                'UpdateCartItem' => [
-                    'type' => Type::nonNull(Type::int()),
-                    'args' => [
-                        'cartitemID' => Type::nonNull(Type::int()),
-                        'quantity' => Type::nonNull(Type::int()),
-                    ],
-                    'resolve' => function ($root, $args) {
-                        try {
-                            $cartitemID = $args['cartitemID'];
-                            $quantity = $args['quantity'];
+                //             return $result;
+                //         } catch (\GraphQL\Error\Error $e) {
+                //             throw new \GraphQL\Error\Error($e->getMessage());
+                //         }
+                //     },
+                // ],
+                // 'UpdateCartItem' => [
+                //     'type' => Type::nonNull(Type::int()),
+                //     'args' => [
+                //         'cartitemID' => Type::nonNull(Type::int()),
+                //         'quantity' => Type::nonNull(Type::int()),
+                //     ],
+                //     'resolve' => function ($root, $args) {
+                //         try {
+                //             $cartitemID = $args['cartitemID'];
+                //             $quantity = $args['quantity'];
 
-                            $result = Cart::updateCartItem(
-                                $this->db,
-                                $cartitemID,
-                                $quantity
-                            );
+                //             $result = Cart::updateCartItem(
+                //                 $this->db,
+                //                 $cartitemID,
+                //                 $quantity
+                //             );
 
-                            if ($result === null) {
-                                throw new \GraphQL\Error\Error('Failed to update cart item.');
-                            }
+                //             if ($result === null) {
+                //                 throw new \GraphQL\Error\Error('Failed to update cart item.');
+                //             }
 
-                            return $result;
-                        } catch (\GraphQL\Error\Error $e) {
-                            throw new \GraphQL\Error\Error($e->getMessage());
-                        }
-                    },
-                ],
+                //             return $result;
+                //         } catch (\GraphQL\Error\Error $e) {
+                //             throw new \GraphQL\Error\Error($e->getMessage());
+                //         }
+                //     },
+                // ],
                 'placeOrder' => [
                     'type' => Type::nonNull(Type::int()), // Return the order ID
                     'args' => [
                         'total' => Type::nonNull(Type::float()), // Total amount for the order
+                        'orderDetails' => Type::nonNull(Type::listOf(Type::string())), // Additional order details
                     ],
                     'resolve' => function ($root, $args) {
                         try {
                             $total = $args['total'];
-    
+                            $orderDetails = json_encode($args['orderDetails']);
                             // Place the order and get the order ID
-                            $orderID = Cart::placeOrder($this->db, $total);
-    
+                            $orderID = Cart::placeOrder($this->db, $total, $orderDetails);
+
                             return $orderID;
                         } catch (\GraphQL\Error\Error $e) {
                             throw new \GraphQL\Error\Error($e->getMessage());

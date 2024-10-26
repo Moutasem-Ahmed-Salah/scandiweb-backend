@@ -139,58 +139,58 @@ GROUP BY
     public static function getProductDetails($db, $productId)
     {
         $query = "
-         SELECT
-    p.id AS product_id,
-    p.name,
-    p.in_stock,
-    p.description AS description,
-    pp.amount AS price,
-    pp.currency_label AS currency_label,
-    pp.currency_symbol AS currency_symbol,
-    c.id AS category_id,
-    c.name AS category_name,
-    GROUP_CONCAT(DISTINCT pi.image_url ORDER BY pi.id ASC SEPARATOR ';') AS image_urls,
-    pa.attribute_name,
-    GROUP_CONCAT(
-        DISTINCT pa.attribute_value 
-        ORDER BY 
-            CASE 
-                -- Custom order for Size: Small, Medium, Large, Extra Large
-                WHEN pa.attribute_name = 'Size' THEN
-                    CASE pa.attribute_value
-                        WHEN 'Small' THEN 1
-                        WHEN 'Medium' THEN 2
-                        WHEN 'Large' THEN 3
-                        WHEN 'Extra Large' THEN 4
-                        ELSE 5
-                    END
-                -- Custom order for Capacity: 256GB, 512GB, 1TB
-                WHEN pa.attribute_name = 'capacity' THEN
-                    CASE pa.attribute_value
-                        WHEN '256GB' THEN 1
-                        WHEN '512GB' THEN 2
-                        WHEN '1TB' THEN 3
-                        ELSE 4
-                    END
-                ELSE 0
-            END ASC, 
-            pa.attribute_value ASC
-        SEPARATOR ','
-    ) AS attribute_values
-FROM
-    products p
-INNER JOIN
-    product_prices pp ON p.id = pp.product_id
-INNER JOIN
-    categories c ON p.category_id = c.id
-LEFT JOIN
-    product_images pi ON p.id = pi.product_id
-LEFT JOIN
-    product_attributes pa ON p.id = pa.product_id
-WHERE
-    p.id = ?
-GROUP BY
-    p.id, pa.attribute_name;
+           SELECT
+        p.id AS product_id,
+        p.name,
+        p.in_stock,
+        p.description AS description,
+        pp.amount AS price,
+        pp.currency_label AS currency_label,
+        pp.currency_symbol AS currency_symbol,
+        c.id AS category_id,
+        c.name AS category_name,
+        GROUP_CONCAT(DISTINCT pi.image_url ORDER BY pi.id ASC SEPARATOR ';') AS image_urls,
+        pa.attribute_name,
+        GROUP_CONCAT(
+            DISTINCT pa.attribute_value 
+            ORDER BY 
+                CASE 
+                    -- Custom order for Size: Small, Medium, Large, Extra Large
+                    WHEN pa.attribute_name = 'Size' THEN
+                        CASE pa.attribute_value
+                            WHEN 'Small' THEN 1
+                            WHEN 'Medium' THEN 2
+                            WHEN 'Large' THEN 3
+                            WHEN 'Extra Large' THEN 4
+                            ELSE 5
+                        END
+                    -- Custom order for Capacity: 256GB, 512GB, 1TB
+                    WHEN pa.attribute_name = 'capacity' THEN
+                        CASE pa.attribute_value
+                            WHEN '256GB' THEN 1
+                            WHEN '512GB' THEN 2
+                            WHEN '1TB' THEN 3
+                            ELSE 4
+                        END
+                    ELSE 0
+                END, 
+                pa.attribute_value
+            SEPARATOR ','
+        ) AS attribute_values
+    FROM
+        products p
+    INNER JOIN
+        product_prices pp ON p.id = pp.product_id
+    INNER JOIN
+        categories c ON p.category_id = c.id
+    LEFT JOIN
+        product_images pi ON p.id = pi.product_id
+    LEFT JOIN
+        product_attributes pa ON p.id = pa.product_id
+    WHERE
+        p.id = ?
+    GROUP BY
+        p.id, p.name, p.in_stock, p.description, pp.amount, pp.currency_label, pp.currency_symbol, c.id, c.name, pa.attribute_name;
         ";
 
         $stmt = $db->prepare($query);
